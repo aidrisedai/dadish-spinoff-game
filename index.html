@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Radish Rescue — a Dadish-style platformer</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div id="game-shell">
+    <canvas id="game" width="960" height="540"></canvas>
+
+    <!-- On-screen touch controls (mobile) -->
+    <div id="touch-controls" class="hidden">
+      <div class="touch-left">
+        <button class="tbtn" data-key="left">◀</button>
+        <button class="tbtn" data-key="right">▶</button>
+      </div>
+      <div class="touch-right">
+        <button class="tbtn jump" data-key="jump">JUMP</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/audio.js"></script>
+  <script src="js/sprites.js"></script>
+  <script src="js/levels.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>
