@@ -1,23 +1,21 @@
-# 🥬 Radish Rescue
+# 🥕 Carrot Quest
 
-A cute, tight precision platformer inspired by the **Dadish** series. You play
-a little radish parent on a mission to rescue all your missing veggie kids —
-hop across platforms, stomp grumpy blobs, grab keys to open locked doors, and
-dodge spikes to reach the exit.
+A clean, crisp **pixel-art** precision platformer inspired by the **Dadish**
+series. You play a little veggie parent rescuing their missing kids across four
+strongly-themed worlds — hop chunky platforms, bounce off springs, dodge saws
+and spikes, grab keys to open locked doors, and stomp grumpy food-blobs.
 
 Built from scratch with **vanilla HTML5 Canvas + JavaScript** — no engine, no
-build step, no asset files. Every sprite (hero, kids, enemies, keys, doors,
-scenery) is drawn procedurally at runtime, so it stays crisp at any size.
-
-![title](https://img.shields.io/badge/play-in%20your%20browser-ff5d7a)
+build step, no image files. Characters are authored as pixel maps with automatic
+heavy navy outlines, tiles are generated as chunky layered environmental pieces,
+and everything is upscaled with nearest-neighbour for clean, crisp pixels.
 
 ## ▶️ Play
 
-Just open `index.html` in a browser. Or serve the folder:
+Open `index.html` in a browser, or serve the folder:
 
 ```bash
-python3 -m http.server 8000
-# then visit http://localhost:8000
+python3 -m http.server 8000     # then visit http://localhost:8000
 ```
 
 No dependencies, no install.
@@ -34,28 +32,34 @@ No dependencies, no install.
 
 On touch devices, on-screen buttons appear automatically.
 
+## 🌍 The four worlds
+
+- **Forest** — bright sky-blue background, leafy trees, tan dirt platforms with
+  grassy tops, crates, and a playful outdoor mood.
+- **Space Lab** — dark navy interiors, purple metal panels with bolts, orange
+  ledges, a moon and starfield, machinery in the background.
+- **Frozen Lab** — pale cracked ice blocks, blue frozen waterfalls, hanging
+  icicles, white spikes, purple key-crates, narrow vertical routes.
+- **Construction** — magenta sky, brick platforms, orange scaffolding,
+  spinning saw blades, city silhouettes, and an obstacle-course feel.
+
 ## 🌟 Features
 
-- **8 hand-built levels** across **4 themed worlds** — Grassland, Desert,
-  Cave, and Ice — each with its own palette and scenery.
+- **8 compact puzzle-room levels** (2 per world) — hazards, keys, and routes
+  are all visible at once; challenge comes from timing and route planning.
+- **Crisp pixel art**: simple, readable shapes with heavy near-black navy
+  outlines; chunky layered tiles (dark border, bright top edge, material face,
+  seams/bolts/cracks, shaded underside).
+- **Layered backgrounds** for depth — far stars/moon/mountains/city, midground
+  trees/machinery/waterfalls, foreground platforms.
 - **Tight game-feel**: variable jump height, coyote time, jump buffering, and
-  squash-&-stretch animation for responsive, forgiving controls.
-- **Rescue the kids**: every level hides veggie children you must collect before
-  the exit door unlocks.
-- **Keys & doors**: grab a key to dissolve a whole locked door blocking your path.
-- **Stompable enemies**: bounce on grumpy blobs from above — or get hurt walking
-  into them.
-- **Hazards**: spikes and bottomless pits send you back to the start (with a
-  death counter so you can chase a low-death clear).
+  frame-based walk/jump animation.
+- **Mechanics**: rescue all kids to unlock the exit; keys dissolve whole locked
+  doors; **springs** bounce you high; **moving platforms** carry you; **saws**
+  and **spikes** are instant-death hazards; stomp enemies from above.
 - **Progress saving**: completed levels unlock the next and remember your best
-  death count (stored in `localStorage`).
-- **Synthesized sound** via the Web Audio API — no audio files needed.
-
-## 🗺️ How to win a level
-
-1. Rescue **all** the kids (counter shown top-left).
-2. The exit door unlocks (🔒 disappears).
-3. Reach the door to clear the level.
+  death count (`localStorage`).
+- **Synthesized sound** via the Web Audio API — no audio files.
 
 ## 🛠️ Project structure
 
@@ -63,29 +67,27 @@ On touch devices, on-screen buttons appear automatically.
 index.html        # canvas + script tags
 css/style.css     # layout, pixel-crisp scaling, touch buttons
 js/audio.js       # tiny Web Audio sound engine
-js/sprites.js     # procedural canvas drawing of every character/object
-js/levels.js      # ASCII tilemaps + theme palettes
-js/game.js        # engine: physics, collision, camera, menus, game loop
+js/sprites.js     # pixel-art engine: sprite maps, tile builders, themes
+js/levels.js      # ASCII tilemaps + moving-platform data
+js/game.js        # engine: physics, collision, camera, render, menus, loop
 ```
 
 ### Level format
 
 Levels are ASCII maps. Tile legend:
 
-| Char | Meaning |
-| ---- | ------- |
-| `#`  | solid ground/wall |
-| `=`  | one-way platform (jump up through it) |
-| `^`  | spike (deadly) |
-| `K`  | key |
-| `L`  | locked block (part of a door) |
-| `C`  | collectible kid |
-| `E`  | walking enemy |
-| `P`  | player spawn |
-| `G`  | exit door |
+| Char | Meaning | Char | Meaning |
+| ---- | ------- | ---- | ------- |
+| `#`  | solid block        | `S` | spring / bounce pad |
+| `=`  | one-way platform   | `X` | saw blade (deadly) |
+| `^`  | spike (deadly)     | `B` | crate (solid) |
+| `K`  | key                | `L` | locked box (door) |
+| `C`  | kid (rescue)       | `E` | walking enemy |
+| `P`  | player spawn       | `G` | exit door |
 
-Add a new level by appending an entry to `LEVELS` in `js/levels.js`.
+Add a level by appending to `LEVELS` in `js/levels.js`; optional `movers`
+add moving platforms.
 
 ---
 
-Made as a Dadish-style spin-off. Have fun! 🍅
+Made as a Dadish-style spin-off. Have fun! 🥕
