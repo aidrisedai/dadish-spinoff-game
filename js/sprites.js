@@ -120,22 +120,67 @@ const Art = (() => {
     '............'
   ];
 
-  // ============================ ENEMIES (food blobs) ========================
-  function enemyMap(b, B) {
-    const p = { b, B, e: '#15193a', w: '#ffffff', m: '#15193a', t: '#ffffff', f: B };
-    return make([
-      '...bbbbbb...',
-      '..bbbbbbbb..',
-      '.bbwwbbwwbb.',
-      '.bbweBbweBb.'.replace(/B/g, 'b'),
-      '.bbwebbwebb.',
-      '.bbbbbbbbbb.',
-      '.bBmmmmmmBb.'.replace(/B/g, 'b'),
-      '.bbtttttbbb.',
-      '.bbbbbbbbbb.',
-      '..bbbbbbbb..',
-      '..f.ff.ff...'.replace(/\./g, (m, i) => m)
-    ].map(r => r), p);
+  // ============================ ENEMIES (food characters!) ==================
+  // Dadish-style: each enemy is a little food with a face. One per world.
+  const EYE = { e: '#15193a', w: '#ffffff', m: '#15193a' };
+  const food = (rows, pal) => make(rows, Object.assign({}, EYE, pal));
+
+  const FOODS = {
+    // green slime blob
+    slime: food([
+      '...gggggg...',
+      '..gggggggg..',
+      '.gggggggggg.',
+      '.gwwggggwwg.',
+      '.gweggggweg.',
+      '.gggggggggg.',
+      '.ggmmmmmmgg.',
+      '.gggggggggg.',
+      '..gggggggg..',
+      '...dd..dd...'
+    ], { g: '#6fcf57', d: '#3f9c4f' }),
+    // burger
+    burger: food([
+      '..BBBBBBBB..',
+      '.BBSBBBSBBB.',
+      '.BBBBBBBBBB.',
+      '.LLLLLLLLLL.',
+      '.PPPPPPPPPP.',
+      '.PwwPPPwwPP.',
+      '.PwePPPwePP.',
+      '.PPPmmmmPPP.',
+      '.BBBBBBBBBB.',
+      '..BBBBBBBB..',
+      '...ff..ff...'
+    ], { B: '#e8b563', S: '#fff3d0', L: '#6fcf57', P: '#a85a32', f: '#cf9a4a' }),
+    // hotdog
+    hotdog: food([
+      '.RRRRRRRRRR.',
+      'RssssssssssR',
+      'RsMsMsMsMssR',
+      'RswwssswwssR',
+      'RswesssweSsR'.replace('S', 'w'),
+      'RssmmmmmmssR',
+      'RssssssssssR',
+      '.RRRRRRRRRR.',
+      '...ff..ff...'
+    ], { R: '#e8b563', s: '#c0563a', M: '#ffd23f', f: '#cf9a4a' }),
+    // cookie
+    cookie: food([
+      '..kkkkkkk..',
+      '.kkkkkkkkk.',
+      '.kDkkkkDkk.',
+      '.kwwkkwwkk.',
+      '.kwekkwekk.',
+      '.kkkkkkkkk.',
+      '.kDkmmmmDk.',
+      '.kkkkkkkkk.',
+      '..kkkkkkk..',
+      '...dd.dd...'
+    ], { k: '#d49a52', D: '#6b4326', d: '#8a5a30' })
+  };
+  function foodFor(themeKey) {
+    return ({ forest: FOODS.slime, lab: FOODS.cookie, ice: FOODS.burger, desert: FOODS.hotdog })[themeKey] || FOODS.slime;
   }
 
   // ============================ small collectible kid =======================
@@ -183,7 +228,7 @@ const Art = (() => {
       sky: ['#5fc6ec', '#a9e6f2'],
       face: '#c98a4e', top: '#7ed47e', topDark: '#5ec46b', shade: '#8f5e30', seam: '#a06a38',
       plat: '#caa05e', platTop: '#e6c98a',
-      spike: '#ffffff', enemy: ['#7ed24f', '#5fb83a'], crate: '#b9803f',
+      spike: '#ffffff', enemy: ['#6fcf57', '#3f9c4f'], crate: '#b9803f',
       bg: 'forest'
     },
     lab: {
@@ -199,16 +244,16 @@ const Art = (() => {
       sky: ['#22335c', '#34507e'],
       face: '#cfe0ee', top: '#ffffff', topDark: '#bcd4e6', shade: '#9fb6cc', seam: '#a9c2d6',
       plat: '#bcd6e8', platTop: '#ffffff',
-      spike: '#ffffff', enemy: ['#7fd4e8', '#5fb0d8'], crate: '#7a52b8',
+      spike: '#ffffff', enemy: ['#e8b563', '#cf9a4a'], crate: '#7a52b8',
       bg: 'ice'
     },
-    city: {
-      name: 'Construction', style: 'brick',
-      sky: ['#b5316f', '#e85aa0'],
-      face: '#c0563a', top: '#e0795a', topDark: '#b34a30', shade: '#8a3a28', seam: '#7a3322',
+    desert: {
+      name: 'Desert', style: 'dirt',
+      sky: ['#6fc8ee', '#cdeefb'],
+      face: '#e6c45a', top: '#ffe49a', topDark: '#f0cf6e', shade: '#b9892f', seam: '#caa040',
       plat: '#f0913a', platTop: '#ffc27a',
-      spike: '#ffffff', enemy: ['#ff6488', '#ffa23a'], crate: '#a86a3a',
-      bg: 'city'
+      spike: '#ffffff', enemy: ['#c0563a', '#a8401f'], crate: '#c98a4e',
+      bg: 'desert'
     }
   };
 
@@ -295,19 +340,23 @@ const Art = (() => {
 
   function buildLock() {
     const c = blank(16, 16), g = c.getContext('2d');
-    px(g, 0, 0, 16, 16, '#7a52c0');
+    const body = '#7a52c0';
+    px(g, 0, 0, 16, 16, body);
     px(g, 0, 0, 16, 1, NAVY); px(g, 0, 15, 16, 1, NAVY);
     px(g, 0, 0, 1, 16, NAVY); px(g, 15, 0, 1, 16, NAVY);
     px(g, 1, 1, 14, 2, '#9a72e0');
     px(g, 1, 13, 14, 2, '#5a3a96');
-    // bolts
+    // corner bolts
     g.fillStyle = '#4a2f80';
-    [[3, 3], [12, 3], [3, 12], [12, 12]].forEach(([x, y]) => g.fillRect(x, y, 2, 2));
-    // keyhole
-    px(g, 7, 5, 2, 3, '#ffd23f');
-    g.fillStyle = '#ffd23f';
-    g.fillRect(6, 8, 4, 3);
-    px(g, 7, 6, 2, 1, '#fff0a0');
+    [[2, 2], [12, 2], [2, 12], [12, 12]].forEach(([x, y]) => g.fillRect(x, y, 2, 2));
+    // bright yellow KEY icon on the face (Dadish-style locked box)
+    const key = '#ffd23f', sh = '#caa017';
+    px(g, 5, 4, 4, 4, key);            // ring
+    px(g, 6, 5, 2, 2, body);           // ring hole
+    px(g, 7, 7, 2, 5, key);            // shaft
+    px(g, 9, 9, 2, 2, key);            // teeth
+    px(g, 9, 11, 1, 1, key);
+    g.fillStyle = sh; g.fillRect(5, 7, 1, 1); g.fillRect(7, 11, 2, 1);
     return c;
   }
 
@@ -431,15 +480,13 @@ const Art = (() => {
     heroJump: make(HERO_JUMP, HP),
     heroHurt: make(HERO_HURT, HP),
     key: KEY,
-    enemy: {},   // filled per colour on demand
     kid: {}
   };
-  function enemy(col, col2) { const k = col; return S.enemy[k] || (S.enemy[k] = enemyMap(col, col2)); }
   function kid(col) { return S.kid[col] || (S.kid[col] = kidMap(col)); }
 
   return {
     NAVY, THEMES, make, shade,
-    sprites: S, enemy, kid,
+    sprites: S, foodFor, kid,
     themeCache, drawSaw
   };
 })();

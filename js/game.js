@@ -131,13 +131,14 @@
   const player = {
     x: 0, y: 0, w: 10, h: 12, vx: 0, vy: 0,
     onGround: false, face: 1, coyote: 0, buffer: 0,
-    anim: 0, hurt: 0, dead: false, deadT: 0, jumpHeld: false
+    anim: 0, hurt: 0, dead: false, deadT: 0, jumpHeld: false, spawnRing: 0
   };
   function resetPlayer() {
     player.x = level.spawn.x + (TILE - player.w) / 2;
     player.y = level.spawn.y + (TILE - player.h);
     player.vx = player.vy = 0;
     player.onGround = false; player.dead = false; player.deadT = 0; player.hurt = 0; player.face = 1;
+    player.spawnRing = 70;
   }
 
   // ---------------------------------------------------------------- camera
@@ -167,6 +168,7 @@
   // ---------------------------------------------------------------- update
   function update() {
     level.t++;
+    if (player.spawnRing > 0) player.spawnRing--;
     for (const s of level.springs) if (s.anim > 0) s.anim--;
     for (const sw of level.saws) sw.rot += 0.18;
     if (player.dead) { updateDeath(); return; }
@@ -427,16 +429,16 @@
       ctx.fillText('locked', sx(level.goal.x + 9), sy(level.goal.y - 4));
     }
 
-    // enemies
+    // enemies (food characters)
     for (const e of level.enemies) {
       if (!e.alive && e.dead > 22) continue;
-      const col = level.theme.enemy;
       if (!e.alive) {
+        const col = level.theme.enemy;
         ctx.fillStyle = col[1];
         ctx.fillRect(sx(e.x + 1), sy(e.y + e.h - 4), (e.w - 2) * SCALE, 4 * SCALE);
         ctx.strokeStyle = Art.NAVY; ctx.lineWidth = SCALE;
         ctx.strokeRect(sx(e.x + 1), sy(e.y + e.h - 4), (e.w - 2) * SCALE, 4 * SCALE);
-      } else blit(Art.enemy(col[0], col[1]), e.x - 1, e.y - 1, e.face < 0);
+      } else blit(Art.foodFor(level.themeKey), e.x - 1, e.y - 1, e.face < 0);
     }
 
     // particles
@@ -446,6 +448,16 @@
       ctx.fillRect(sx(p.x), sy(p.y), (p.r + 1) * SCALE, (p.r + 1) * SCALE);
     }
     ctx.globalAlpha = 1;
+
+    // spawn ring (Dadish-style checkpoint halo)
+    if (player.spawnRing > 0 && !player.dead) {
+      const a = Math.min(1, player.spawnRing / 70);
+      ctx.globalAlpha = a * 0.85; ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2;
+      ctx.setLineDash([4 * SCALE, 4 * SCALE]); ctx.lineDashOffset = -level.t * 1.5;
+      ctx.beginPath();
+      ctx.arc(sx(player.x + player.w / 2), sy(player.y + player.h / 2), 13 * SCALE, 0, Math.PI * 2);
+      ctx.stroke(); ctx.setLineDash([]); ctx.globalAlpha = 1;
+    }
 
     // hero
     if (!player.dead || player.deadT < 26) {
@@ -501,9 +513,15 @@
     skyGrad(th.sky[0], th.sky[1]);
     if (key === 'forest') {
       ctx.fillStyle = '#fff6c0'; ctx.beginPath(); ctx.arc(W * 0.8, H * 0.22, 36, 0, Math.PI * 2); ctx.fill();
+      clouds(0.18);
       layerHills('#bfe6a0', 0.25, 0.78, 150);
       layerHills('#9ad17e', 0.4, 0.86, 110);
       layerTrees(0.55);
+    } else if (key === 'desert') {
+      clouds(0.18);
+      layerHills('#ecd083', 0.25, 0.8, 150);
+      layerHills('#dcb85e', 0.4, 0.88, 110);
+      cacti(0.55);
     } else if (key === 'lab') {
       starfield(); ctx.fillStyle = '#d8d2ff'; ctx.beginPath(); ctx.arc(W * 0.18, H * 0.25, 30, 0, Math.PI * 2); ctx.fill();
       ctx.fillStyle = '#bcb4f0'; ctx.beginPath(); ctx.arc(W * 0.18 - 10, H * 0.25 - 8, 30, 0, Math.PI * 2); ctx.fill();
@@ -511,10 +529,28 @@
       machinery(0.4);
     } else if (key === 'ice') {
       frozenFalls(0.3); icicles();
-    } else if (key === 'city') {
-      ctx.fillStyle = '#ffe6a0'; ctx.beginPath(); ctx.arc(W * 0.82, H * 0.2, 28, 0, Math.PI * 2); ctx.fill();
-      cityscape(0.3, '#8a2358', 0.7, 80);
-      cityscape(0.45, '#6f1c48', 1.0, 55);
+    }
+  }
+  function clouds(par) {
+    const off = cam.x * SCALE * par; ctx.fillStyle = 'rgba(255,255,255,0.92)';
+    for (let i = -1; i < 6; i++) {
+      const x = i * 280 - (off % 280) + 80, y = 64 + ((i * 67) % 90);
+      ctx.beginPath();
+      ctx.arc(x, y, 18, 0, Math.PI * 2); ctx.arc(x + 22, y + 5, 24, 0, Math.PI * 2);
+      ctx.arc(x + 46, y, 18, 0, Math.PI * 2); ctx.arc(x + 22, y - 8, 20, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+  function cacti(par) {
+    const off = cam.x * SCALE * par;
+    for (let i = -1; i < 8; i++) {
+      const x = i * 240 - (off % 240) + 90, y = H * 0.55;
+      ctx.fillStyle = '#3fa05a';
+      ctx.fillRect(x - 7, y, 14, 100);
+      ctx.fillRect(x - 24, y + 22, 16, 13); ctx.fillRect(x - 24, y + 9, 13, 26);
+      ctx.fillRect(x + 8, y + 12, 16, 13); ctx.fillRect(x + 11, y, 13, 25);
+      ctx.fillStyle = '#2f8047';
+      ctx.fillRect(x + 1, y, 6, 100); ctx.fillRect(x + 11, y + 22, 13, 4);
     }
   }
   function layerHills(col, par, baseY, rad) {
@@ -566,18 +602,6 @@
       ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x + 8, 0); ctx.lineTo(x + 4, h); ctx.closePath(); ctx.fill();
     }
   }
-  function cityscape(par, col, alpha, baseH) {
-    const off = cam.x * SCALE * par; ctx.fillStyle = col; ctx.globalAlpha = alpha;
-    for (let i = -1; i < 12; i++) {
-      const x = i * 120 - (off % 120); const h = baseH + ((i * 53) % 90);
-      ctx.fillRect(x, H - h, 90, h);
-      ctx.fillStyle = 'rgba(255,220,120,0.5)';
-      for (let a = 0; a < 3; a++) for (let b = 0; b < 4; b++) if ((i + a + b) % 2) ctx.fillRect(x + 12 + a * 24, H - h + 14 + b * 20, 8, 10);
-      ctx.fillStyle = col;
-    }
-    ctx.globalAlpha = 1;
-  }
-
   // ---------------------------------------------------------------- HUD
   function drawHUD() {
     panel(14, 12, 250, 44);

@@ -128,7 +128,7 @@ const LEVELS = [
   },
   // ---------------------------------------------------------------- CITY 1
   {
-    name: 'Scaffold Heights', theme: 'city',
+    name: 'Cactus Gulch', theme: 'desert',
     map: [
       '............................',
       '......C..........C..........',
@@ -146,7 +146,7 @@ const LEVELS = [
   },
   // ---------------------------------------------------------------- CITY 2
   {
-    name: 'Demolition Zone', theme: 'city',
+    name: 'Sandstorm Run', theme: 'desert',
     map: [
       '..............................',
       '...C......K.......C....K......',

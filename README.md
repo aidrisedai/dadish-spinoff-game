@@ -34,14 +34,18 @@ On touch devices, on-screen buttons appear automatically.
 
 ## 🌍 The four worlds
 
-- **Forest** — bright sky-blue background, leafy trees, tan dirt platforms with
-  grassy tops, crates, and a playful outdoor mood.
+- **Forest** — bright sky-blue background, fluffy clouds, leafy trees, tan dirt
+  platforms with grassy tops, and a playful outdoor mood.
 - **Space Lab** — dark navy interiors, purple metal panels with bolts, orange
   ledges, a moon and starfield, machinery in the background.
 - **Frozen Lab** — pale cracked ice blocks, blue frozen waterfalls, hanging
   icicles, white spikes, purple key-crates, narrow vertical routes.
-- **Construction** — magenta sky, brick platforms, orange scaffolding,
-  spinning saw blades, city silhouettes, and an obstacle-course feel.
+- **Desert** — clear blue sky with clouds, golden sand blocks, cacti, spinning
+  saw blades, and sun-baked obstacle courses.
+
+Each world has its own **food enemy** (a slime, a cookie, a burger, a hotdog) —
+little characters with faces, in true Dadish spirit. Locked boxes show a bright
+yellow key icon, and a dashed spawn-ring halo marks where you (re)appear.
 
 ## 🌟 Features
 
